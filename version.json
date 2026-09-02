@@ -1,0 +1,15 @@
+{
+  "_notes": "App 启动时会 GET 这个文件，比较 versionCode 判断是否有新版本。apkUrl 是 GitHub Release 的直接下载链接。",
+  "parent": {
+    "versionCode": 4,
+    "versionName": "3.0",
+    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0.apk",
+    "changelog": "• v3.0 首发：MQTT 跨网络远程控制\n• 四级按钮（暂停/恢复/锁屏/解锁）\n• 状态卡实时同步"
+  },
+  "child": {
+    "versionCode": 5,
+    "versionName": "3.0",
+    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
+    "changelog": "• v3.0 首发：DeviceOwner 管控\n• GameBlockMatcher 游戏拦截\n• MQTT + HTTP 双通道远程控制\n• 三级动态轮询低功耗优化"
+  }
+}
