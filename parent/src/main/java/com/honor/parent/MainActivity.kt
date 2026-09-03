@@ -209,9 +209,14 @@ class MainActivity : AppCompatActivity() {
             var body: String? = null
             for (u in urls) {
                 try {
-                    val conn = URL(u).openConnection() as HttpURLConnection
+                    // v20: 加时间戳参数 + 禁缓存，防止手机网络/CDN边缘节点返回旧 version.json
+                    val sep = if (u.contains("?")) "&" else "?"
+                    val conn = URL(u + sep + "ts=" + System.currentTimeMillis()).openConnection() as HttpURLConnection
                     conn.connectTimeout = 6000
                     conn.readTimeout = 6000
+                    conn.useCaches = false
+                    conn.setRequestProperty("Cache-Control", "no-cache")
+                    conn.setRequestProperty("Pragma", "no-cache")
                     body = conn.inputStream.bufferedReader().readText()
                     conn.disconnect()
                     if (body.isNotEmpty()) break

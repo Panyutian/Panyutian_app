@@ -153,10 +153,15 @@ class MainActivity : AppCompatActivity() {
     private fun checkUpdate() {
         thread {
             try {
-                val url = URL("https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json")
+                // v20: 加时间戳参数 + 禁缓存，防止手机网络/CDN边缘节点返回旧 version.json
+                val baseUrl = "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json"
+                val url = URL(baseUrl + "?ts=" + System.currentTimeMillis())
                 val conn = url.openConnection() as HttpURLConnection
                 conn.connectTimeout = 8000
                 conn.readTimeout = 8000
+                conn.useCaches = false
+                conn.setRequestProperty("Cache-Control", "no-cache")
+                conn.setRequestProperty("Pragma", "no-cache")
                 val body = conn.inputStream.bufferedReader().readText()
                 conn.disconnect()
 
