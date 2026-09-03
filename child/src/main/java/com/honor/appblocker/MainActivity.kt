@@ -47,6 +47,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: PrefsManager
 
+    // v19: 当前安装版本，例如 "v3.0（19）"，直接取自系统 PackageManager，永远和实际安装一致
+    private val appVersion: String by lazy {
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            val code = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                pInfo.longVersionCode.toInt()
+            } else {
+                @Suppress("DEPRECATION") pInfo.versionCode
+            }
+            "v${pInfo.versionName}（$code）"
+        } catch (e: Exception) { "v3.0" }
+    }
+
     // ========= 家长锁：点击标题 → 输入密码解锁 =========
     private var parentUnlocked = false
 
@@ -79,6 +92,9 @@ class MainActivity : AppCompatActivity() {
         // v3.0: 标题栏附加 DeviceId（家长端需要这个 ID 才能跨网络控制）
         val deviceId = MqttConfig.defaultChildDeviceId(this)
         binding.tvHeaderTitle.text = "🛡️ 荣耀应用更新\n📡 DeviceId: $deviceId"
+
+        // v19: 界面显示当前版本号（伪装页显示"组件版本"，家长解锁后的真界面也显示）
+        binding.tvStealthVersion.text = "组件版本 $appVersion"
 
         // DeviceOwner策略漂移自愈（重启/ROM升级可能清除限制）+ 开关状态与系统策略同步
         AdminReceiver.enforceAllPolicies(this)
@@ -158,9 +174,15 @@ class MainActivity : AppCompatActivity() {
 
                 if (latestCode > currentCode) {
                     mainHandler.post {
+                        val msg = buildString {
+                            append("发现新的系统更新。\n\n")
+                            append("当前版本：v$latestName（$currentCode）\n")
+                            append("最新版本：v$latestName（$latestCode）")
+                            if (changelog.isNotBlank()) append("\n\n更新内容：$changelog")
+                        }
                         AlertDialog.Builder(this@MainActivity)
                             .setTitle("🔄 系统更新")
-                            .setMessage("发现新的系统更新 (build $latestCode)，是否立即下载并安装？")
+                            .setMessage(msg)
                             .setPositiveButton("立即安装") { _, _ -> downloadAndInstall(apkUrl, latestName) }
                             .setNegativeButton("稍后") { _, _ -> }
                             .show()
@@ -606,7 +628,7 @@ class MainActivity : AppCompatActivity() {
             else -> "🔴 MQTT 重连中... ${MqttBridge.lastError.take(50)}"
         }
         val deviceId = MqttConfig.defaultChildDeviceId(this)
-        binding.tvHeaderTitle.text = "🛡️ 荣耀应用管控\n📡 $deviceId\n$mqttStatus"
+        binding.tvHeaderTitle.text = "🛡️ 荣耀应用管控\n📡 $deviceId\n$mqttStatus\n当前版本 $appVersion"
 
         // --- 应用家长锁 UI ---
         applyParentLockState()

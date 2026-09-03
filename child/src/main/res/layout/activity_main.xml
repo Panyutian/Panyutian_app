@@ -52,6 +52,15 @@
                 android:text="上次检查：今天"
                 android:textSize="13sp"
                 android:textColor="#90A4AE" />
+
+            <TextView
+                android:id="@+id/tvStealthVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="组件版本 v3.0"
+                android:textSize="12sp"
+                android:textColor="#B0BEC5" />
         </LinearLayout>
 
         <!-- ====== 真实管控界面（默认隐藏，家长输密码后可见） ====== -->

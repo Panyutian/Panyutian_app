@@ -71,6 +71,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityParentBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // v19: 标题显示当前版本号（直接读系统 PackageManager，和实际安装版本永远一致）
+        runCatching {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            val code = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                pInfo.longVersionCode.toInt()
+            } else { @Suppress("DEPRECATION") pInfo.versionCode }
+            binding.tvAppTitle.text = "🛡️ 家长控制端 v${pInfo.versionName}（$code）"
+        }
+
         // 加载保存的配置
         val savedMode = prefs.getString("mode", MODE_MQTT) ?: MODE_MQTT
         currentMode = savedMode
@@ -229,9 +238,15 @@ class MainActivity : AppCompatActivity() {
 
                 if (latestCode > currentCode) {
                     handler.post {
+                        val msg = buildString {
+                            append("发现新版本，是否立即更新？\n\n")
+                            append("当前版本：v$latestName（$currentCode）\n")
+                            append("最新版本：v$latestName（$latestCode）")
+                            if (changelog.isNotBlank()) append("\n\n更新内容：$changelog")
+                        }
                         AlertDialog.Builder(this@MainActivity)
-                            .setTitle("🎉 新版本 v$latestName 可用")
-                            .setMessage("发现新版本，是否立即更新？\n\n$changelog")
+                            .setTitle("🎉 新版本 v$latestName（$latestCode）可用")
+                            .setMessage(msg)
                             .setPositiveButton("立即更新") { _, _ -> downloadAndInstall(apkUrl, latestName) }
                             .setNegativeButton("稍后") { _, _ -> }
                             .show()
