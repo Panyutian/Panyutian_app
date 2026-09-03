@@ -5,8 +5,12 @@ setlocal
 set "GIT=G:\HonorAppBlocker\Tools\PortableGit\bin\git.exe"
 set "SRC=G:\HonorAppBlocker\v3_mqtt"
 set "REPO=G:\HonorAppBlocker\Panyutian_app"
-rem Log file: English name, always written next to this .bat
-set "LOG=%~dp0upload_log.txt"
+rem Log file: English name. Default next to this .bat; wrappers may override via UPLOAD_LOG
+if defined UPLOAD_LOG (
+    set "LOG=%UPLOAD_LOG%"
+) else (
+    set "LOG=%~dp0upload.txt"
+)
 
 echo ===== %date% %time% start upload ===== > "%LOG%"
 
