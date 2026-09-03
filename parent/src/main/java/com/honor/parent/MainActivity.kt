@@ -197,68 +197,94 @@ class MainActivity : AppCompatActivity() {
 
     // ============ 自动更新 ============
 
-    private fun checkUpdate() {
-        thread {
-            // 三条线路依次尝试：jsDelivr CDN → ghfast.top 国内镜像 → GitHub raw 直连
-            // 一条不通自动换下一条（jsDelivr 国内部分网络屏蔽，不能只依赖一条）
-            val urls = listOf(
-                "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
-                "https://ghfast.top/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
-                "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json"
-            )
-            var body: String? = null
-            for (u in urls) {
+    // v21: 一条更新线路的查询结果
+    private data class UpdateInfo(
+        val code: Int,
+        val name: String,
+        val apkUrl: String,
+        val changelog: String,
+        val source: String
+    )
+
+    /**
+     * v21: 多线路并发查询 version.json，取版本号最高的结果。
+     * 背景：jsDelivr 各地缓存节点刷新时间不一（实测同一时刻三个节点分别返回 17/18/19），
+     * 老逻辑"顺序尝试、首条成功即采用"会被旧缓存压住更新提示。
+     * 现在并发查全部线路并取最高版本号，任何一条线路拿到新版就提示，CDN 缓存延迟不再影响更新。
+     *
+     * @param appKey "parent" 或 "child"
+     */
+    private fun fetchLatestUpdate(appKey: String): UpdateInfo? {
+        val urls = listOf(
+            "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://fastly.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://gcore.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://jsd.cdn.zzko.cn/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://ghfast.top/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
+            "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
+            "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json"
+        )
+        val results = java.util.Collections.synchronizedList(mutableListOf<UpdateInfo>())
+        val latch = java.util.concurrent.CountDownLatch(urls.size)
+        for (u in urls) {
+            Thread {
                 try {
-                    // v20: 加时间戳参数 + 禁缓存，防止手机网络/CDN边缘节点返回旧 version.json
-                    val sep = if (u.contains("?")) "&" else "?"
-                    val conn = URL(u + sep + "ts=" + System.currentTimeMillis()).openConnection() as HttpURLConnection
+                    // 时间戳参数 + 禁缓存头，绕开节点缓存
+                    val conn = URL("$u?ts=${System.currentTimeMillis()}").openConnection() as HttpURLConnection
                     conn.connectTimeout = 6000
                     conn.readTimeout = 6000
                     conn.useCaches = false
                     conn.setRequestProperty("Cache-Control", "no-cache")
                     conn.setRequestProperty("Pragma", "no-cache")
-                    body = conn.inputStream.bufferedReader().readText()
+                    val body = conn.inputStream.bufferedReader().readText()
                     conn.disconnect()
-                    if (body.isNotEmpty()) break
+                    val obj = JSONObject(body).getJSONObject(appKey)
+                    results.add(UpdateInfo(
+                        code = obj.getInt("versionCode"),
+                        name = obj.getString("versionName"),
+                        apkUrl = obj.getString("apkUrl"),
+                        changelog = obj.optString("changelog", ""),
+                        source = u
+                    ))
                 } catch (e: Exception) {
                     android.util.Log.e("UpdateCheck", "线路失败: $u (${e.message})")
+                } finally {
+                    latch.countDown()
                 }
-            }
-            if (body.isNullOrEmpty()) {
+            }.start()
+        }
+        latch.await(15, java.util.concurrent.TimeUnit.SECONDS)
+        return results.maxByOrNull { it.code }
+    }
+
+    private fun checkUpdate() {
+        thread {
+            val info = fetchLatestUpdate("parent")
+            if (info == null) {
                 android.util.Log.e("UpdateCheck", "所有线路都失败，跳过检查")
                 return@thread
             }
-            try {
-                val json = JSONObject(body)
-                val parent = json.getJSONObject("parent")
-                val latestCode = parent.getInt("versionCode")
-                val latestName = parent.getString("versionName")
-                val apkUrl = parent.getString("apkUrl")
-                val changelog = parent.optString("changelog", "")
-                val currentCode = runCatching {
-                    packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
-                }.getOrDefault(0)
+            val currentCode = runCatching {
+                packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
+            }.getOrDefault(0)
 
-                android.util.Log.w("UpdateCheck", "local=$currentCode remote=$latestCode")
+            android.util.Log.w("UpdateCheck", "local=$currentCode best=${info.code} source=${info.source}")
 
-                if (latestCode > currentCode) {
-                    handler.post {
-                        val msg = buildString {
-                            append("发现新版本，是否立即更新？\n\n")
-                            append("当前版本：v$latestName（$currentCode）\n")
-                            append("最新版本：v$latestName（$latestCode）")
-                            if (changelog.isNotBlank()) append("\n\n更新内容：$changelog")
-                        }
-                        AlertDialog.Builder(this@MainActivity)
-                            .setTitle("🎉 新版本 v$latestName（$latestCode）可用")
-                            .setMessage(msg)
-                            .setPositiveButton("立即更新") { _, _ -> downloadAndInstall(apkUrl, latestName) }
-                            .setNegativeButton("稍后") { _, _ -> }
-                            .show()
+            if (info.code > currentCode) {
+                handler.post {
+                    val msg = buildString {
+                        append("发现新版本，是否立即更新？\n\n")
+                        append("当前版本：v${info.name}（$currentCode）\n")
+                        append("最新版本：v${info.name}（${info.code}）")
+                        if (info.changelog.isNotBlank()) append("\n\n更新内容：${info.changelog}")
                     }
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle("🎉 新版本 v${info.name}（${info.code}）可用")
+                        .setMessage(msg)
+                        .setPositiveButton("立即更新") { _, _ -> downloadAndInstall(info.apkUrl, info.name) }
+                        .setNegativeButton("稍后") { _, _ -> }
+                        .show()
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("UpdateCheck", "FAIL (silent)", e)
             }
         }
     }

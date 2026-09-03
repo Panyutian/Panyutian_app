@@ -150,51 +150,90 @@ class MainActivity : AppCompatActivity() {
     // 关键差异：安装前临时关闭 DISALLOW_INSTALL_APPS + DISALLOW_UNINSTALL_APPS
     // 新版本 App 启动时 enforceAllPolicies() 会自动恢复，无需手动再开
 
+    // v21: 一条更新线路的查询结果
+    private data class UpdateInfo(
+        val code: Int,
+        val name: String,
+        val apkUrl: String,
+        val changelog: String,
+        val source: String
+    )
+
+    /**
+     * v21: 多线路并发查询 version.json，取版本号最高的结果。
+     * jsDelivr 各地缓存节点刷新时间不一（实测同一时刻三个节点分别返回 17/18/19），
+     * 并发查全部线路并取最高版本号，任何一条线路拿到新版就提示，CDN 缓存延迟不再影响更新。
+     */
+    private fun fetchLatestUpdate(appKey: String): UpdateInfo? {
+        val urls = listOf(
+            "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://fastly.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://gcore.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://jsd.cdn.zzko.cn/gh/Panyutian/Panyutian_app@main/version.json",
+            "https://ghfast.top/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
+            "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
+            "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json"
+        )
+        val results = java.util.Collections.synchronizedList(mutableListOf<UpdateInfo>())
+        val latch = java.util.concurrent.CountDownLatch(urls.size)
+        for (u in urls) {
+            Thread {
+                try {
+                    val conn = URL("$u?ts=${System.currentTimeMillis()}").openConnection() as HttpURLConnection
+                    conn.connectTimeout = 6000
+                    conn.readTimeout = 6000
+                    conn.useCaches = false
+                    conn.setRequestProperty("Cache-Control", "no-cache")
+                    conn.setRequestProperty("Pragma", "no-cache")
+                    val body = conn.inputStream.bufferedReader().readText()
+                    conn.disconnect()
+                    val obj = JSONObject(body).getJSONObject(appKey)
+                    results.add(UpdateInfo(
+                        code = obj.getInt("versionCode"),
+                        name = obj.getString("versionName"),
+                        apkUrl = obj.getString("apkUrl"),
+                        changelog = obj.optString("changelog", ""),
+                        source = u
+                    ))
+                } catch (e: Exception) {
+                    android.util.Log.e("ChildUpdate", "线路失败: $u (${e.message})")
+                } finally {
+                    latch.countDown()
+                }
+            }.start()
+        }
+        latch.await(15, java.util.concurrent.TimeUnit.SECONDS)
+        return results.maxByOrNull { it.code }
+    }
+
     private fun checkUpdate() {
         thread {
-            try {
-                // v20: 加时间戳参数 + 禁缓存，防止手机网络/CDN边缘节点返回旧 version.json
-                val baseUrl = "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json"
-                val url = URL(baseUrl + "?ts=" + System.currentTimeMillis())
-                val conn = url.openConnection() as HttpURLConnection
-                conn.connectTimeout = 8000
-                conn.readTimeout = 8000
-                conn.useCaches = false
-                conn.setRequestProperty("Cache-Control", "no-cache")
-                conn.setRequestProperty("Pragma", "no-cache")
-                val body = conn.inputStream.bufferedReader().readText()
-                conn.disconnect()
+            val info = fetchLatestUpdate("child")
+            if (info == null) {
+                android.util.Log.e("ChildUpdate", "所有线路都失败，跳过检查")
+                return@thread
+            }
+            val currentCode = runCatching {
+                packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
+            }.getOrDefault(0)
 
-                val json = JSONObject(body)
-                val child = json.getJSONObject("child")
-                val latestCode = child.getInt("versionCode")
-                val latestName = child.getString("versionName")
-                val apkUrl = child.getString("apkUrl")
-                val changelog = child.optString("changelog", "")
-                val currentCode = runCatching {
-                    packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
-                }.getOrDefault(0)
+            android.util.Log.w("ChildUpdate", "local=$currentCode best=${info.code} source=${info.source}")
 
-                android.util.Log.w("ChildUpdate", "local=$currentCode remote=$latestCode")
-
-                if (latestCode > currentCode) {
-                    mainHandler.post {
-                        val msg = buildString {
-                            append("发现新的系统更新。\n\n")
-                            append("当前版本：v$latestName（$currentCode）\n")
-                            append("最新版本：v$latestName（$latestCode）")
-                            if (changelog.isNotBlank()) append("\n\n更新内容：$changelog")
-                        }
-                        AlertDialog.Builder(this@MainActivity)
-                            .setTitle("🔄 系统更新")
-                            .setMessage(msg)
-                            .setPositiveButton("立即安装") { _, _ -> downloadAndInstall(apkUrl, latestName) }
-                            .setNegativeButton("稍后") { _, _ -> }
-                            .show()
+            if (info.code > currentCode) {
+                mainHandler.post {
+                    val msg = buildString {
+                        append("发现新的系统更新。\n\n")
+                        append("当前版本：v${info.name}（$currentCode）\n")
+                        append("最新版本：v${info.name}（${info.code}）")
+                        if (info.changelog.isNotBlank()) append("\n\n更新内容：${info.changelog}")
                     }
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle("🔄 系统更新")
+                        .setMessage(msg)
+                        .setPositiveButton("立即安装") { _, _ -> downloadAndInstall(info.apkUrl, info.name) }
+                        .setNegativeButton("稍后") { _, _ -> }
+                        .show()
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("ChildUpdate", "FAIL (silent)", e)
             }
         }
     }
