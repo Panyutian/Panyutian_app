@@ -2,38 +2,31 @@
 chcp 65001 >nul
 title Upload to GitHub
 setlocal
+rem ===== 路径说明 =====
+rem 本脚本放在 APK 文件夹里，双击即可上传代码到 GitHub。
+rem 上级目录（..）就是 Android 工程 + git 仓库：
+rem   ..\child\   = 孩子端模块
+rem   ..\parent\  = 家长端模块
+rem   ..\scripts\ = 两端共用脚本
+rem 日志固定写在本文件夹：upload_log.txt
 set "GIT=G:\HonorAppBlocker\Tools\PortableGit\bin\git.exe"
-set "SRC=G:\HonorAppBlocker\v3_mqtt"
-set "REPO=G:\HonorAppBlocker\Panyutian_app"
-rem Log file: English name. Default next to this .bat; wrappers may override via UPLOAD_LOG
-if defined UPLOAD_LOG (
-    set "LOG=%UPLOAD_LOG%"
-) else (
-    set "LOG=%~dp0upload.txt"
-)
+set "REPO=%~dp0.."
+set "LOG=%~dp0upload_log.txt"
 
 echo ===== %date% %time% start upload ===== > "%LOG%"
 
 echo.
-echo [1/3] Sync code to repo ...
-echo [1/3] robocopy start >> "%LOG%"
-robocopy "%SRC%" "%REPO%" /E /XD build .gradle .kotlin .idea APK .git /XF *.apk *.jks *.keystore local.properties /NFL /NDL /NJH /NJS /NP >> "%LOG%" 2>&1
-if %errorlevel% GEQ 8 (
-    echo [1/3] sync failed, exit code %errorlevel% >> "%LOG%"
-    goto :fail
-)
-
-echo [2/3] Commit changes ...
-echo [2/3] git add + commit >> "%LOG%"
+echo [1/2] Commit changes ...
+echo [1/2] git add + commit >> "%LOG%"
 "%GIT%" -C "%REPO%" add -A >> "%LOG%" 2>&1
 "%GIT%" -C "%REPO%" commit -m "code update %date% %time%" >> "%LOG%" 2>&1
 if %errorlevel% NEQ 0 (
     echo No new changes, continue to push ...
-    echo [2/3] nothing to commit, continue >> "%LOG%"
+    echo [1/2] nothing to commit, continue >> "%LOG%"
 )
 
-echo [3/3] Push to GitHub (auto retry on network issues, please wait) ...
-echo [3/3] git pull --rebase + push >> "%LOG%"
+echo [2/2] Push to GitHub (auto retry on network issues, please wait) ...
+echo [2/2] git pull --rebase + push >> "%LOG%"
 "%GIT%" -C "%REPO%" pull --rebase >> "%LOG%" 2>&1
 
 set PUSH_OK=0
@@ -45,7 +38,7 @@ if %errorlevel% EQU 0 (
     goto :pushdone
 )
 echo Push failed, retry in 5 seconds (attempt %TRY%/3) ...
-echo [3/3] push attempt %TRY% failed, retrying >> "%LOG%"
+echo [2/2] push attempt %TRY% failed, retrying >> "%LOG%"
 timeout /t 5 /nobreak >nul
 set /a TRY+=1
 if %TRY% LEQ 3 goto :pushretry
@@ -63,7 +56,7 @@ if %PUSH_OK% EQU 1 (
 
 :fail
 echo.
-echo FAILED! Details written to log, opening now ...
+echo FAILED! Details written to upload_log.txt, opening now ...
 echo ===== %date% %time% upload failed ===== >> "%LOG%"
 start notepad "%LOG%"
 pause
