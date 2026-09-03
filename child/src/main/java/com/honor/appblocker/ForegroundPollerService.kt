@@ -196,49 +196,65 @@ class ForegroundPollerService : Service() {
             android.util.Log.i(TAG, "🔄 开始静默更新流程...")
             var tempFile: File? = null
             try {
-                // Step 1: 拉 version.json 拿 child 最新 APK 地址
-                // 三条线路依次尝试：jsDelivr CDN → ghfast.top 国内镜像 → GitHub raw 直连
-                val jsonUrls = listOf(
+                // Step 1: v23 修复 —— 和家长端一致：7 条线路并发查 version.json，
+                // 取版本号最高的结果（jsDelivr 各边缘节点缓存刷新时间不一，顺序尝试首条成功会被旧缓存压住）。
+                val urls = listOf(
                     "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+                    "https://fastly.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+                    "https://gcore.jsdelivr.net/gh/Panyutian/Panyutian_app@main/version.json",
+                    "https://jsd.cdn.zzko.cn/gh/Panyutian/Panyutian_app@main/version.json",
                     "https://ghfast.top/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
+                    "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json",
                     "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/version.json"
                 )
-                var body: String? = null
-                for (u in jsonUrls) {
-                    try {
-                        val conn = URL(u).openConnection() as HttpURLConnection
-                        conn.connectTimeout = 6000; conn.readTimeout = 6000
-                        body = conn.inputStream.bufferedReader().readText()
-                        conn.disconnect()
-                        if (!body.isNullOrEmpty()) break
-                    } catch (e: Exception) {
-                        android.util.Log.e(TAG, "版本检查线路失败: $u (${e.message})")
+                data class VerResult(val code: Int, val name: String, val apkUrl: String, val source: String)
+                val results = java.util.Collections.synchronizedList(mutableListOf<VerResult>())
+                val latch = java.util.concurrent.CountDownLatch(urls.size)
+                for (u in urls) {
+                    thread(start = true) {
+                        try {
+                            val conn = URL("$u?ts=${System.currentTimeMillis()}").openConnection() as HttpURLConnection
+                            conn.connectTimeout = 6000; conn.readTimeout = 6000
+                            conn.useCaches = false
+                            conn.setRequestProperty("Cache-Control", "no-cache")
+                            conn.setRequestProperty("Pragma", "no-cache")
+                            val body = conn.inputStream.bufferedReader().readText()
+                            conn.disconnect()
+                            val child = JSONObject(body).getJSONObject("child")
+                            results.add(VerResult(
+                                code = child.getInt("versionCode"),
+                                name = child.getString("versionName"),
+                                apkUrl = child.getString("apkUrl"),
+                                source = u
+                            ))
+                        } catch (e: Exception) {
+                            android.util.Log.e(TAG, "版本检查线路失败: $u (${e.message})")
+                        } finally {
+                            latch.countDown()
+                        }
                     }
                 }
-                if (body.isNullOrEmpty()) {
+                latch.await(15, java.util.concurrent.TimeUnit.SECONDS)
+                val best = results.maxByOrNull { it.code }
+                if (best == null) {
                     android.util.Log.e(TAG, "❌ 版本检查所有线路都失败")
                     showUpdateDoneNotification("更新失败: 无法连接版本服务器")
                     return@thread
                 }
 
-                val json = JSONObject(body!!)
-                val child = json.getJSONObject("child")
-                val latestCode = child.getInt("versionCode")
-                val latestName = child.getString("versionName")
-                var apkUrl = child.getString("apkUrl")
-
                 val currentCode = runCatching {
                     packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
                 }.getOrDefault(0)
 
-                android.util.Log.i(TAG, "🔄 版本检查: local=$currentCode remote=$latestCode")
-                if (latestCode <= currentCode) {
+                android.util.Log.i(TAG, "🔄 版本检查: local=$currentCode remote=${best.code} source=${best.source}")
+                if (best.code <= currentCode) {
                     android.util.Log.i(TAG, "🔄 已是最新版本，跳过更新")
                     showUpdateDoneNotification("${packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0))} 已是最新版本")
                     return@thread
                 }
 
                 // Step 2: 国内镜像替换
+                var apkUrl = best.apkUrl
                 if (apkUrl.contains("github.com")) apkUrl = "https://ghfast.top/$apkUrl"
                 android.util.Log.i(TAG, "🔄 下载 APK: $apkUrl")
 

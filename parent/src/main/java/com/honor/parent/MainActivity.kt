@@ -718,6 +718,16 @@ class MainActivity : AppCompatActivity() {
         val lockRemain = json.optInt("lock_remaining_seconds", 0)
         val now = System.currentTimeMillis()
 
+        // v24: 显示孩子端当前版本号（从 MQTT status body 里解析）
+        val vCode = json.optInt("version_code", -1)
+        val vName = json.optString("version_name", "")
+        runCatching {
+            if (vCode > 0) {
+                binding.tvChildVersion.text = "孩子端版本：v$vName（$vCode）✅"
+                binding.tvChildVersion.setTextColor(0xFF2E7D32.toInt())
+            }
+        }
+
         // 缓存所有状态（给每秒刷新用）
         currentBlockInstall = blockInstall
         pauseWasPaused = paused

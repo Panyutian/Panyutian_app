@@ -452,10 +452,20 @@
             android:id="@+id/btnPushChildUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:text="📡 推送孩子端更新"
             android:textSize="15sp"
             app:backgroundTint="#1976D2" />
+
+        <TextView
+            android:id="@+id/tvChildVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="孩子端版本：未知（未连接）"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
 
         <TextView
             android:layout_width="match_parent"

@@ -307,6 +307,12 @@ class MqttBridge(private val context: Context) {
             put("block_install_apps", prefs.blockInstallApps)
             put("force_locked", prefs.forceLocked)
             put("lock_remaining_seconds", prefs.forceLockRemainingSeconds())
+            // v24: 家长端需要知道孩子端当前版本号，用于更新推送后的确认
+            val pkgInfo = runCatching { context.packageManager.getPackageInfo(context.packageName, 0) }.getOrNull()
+            if (pkgInfo != null) {
+                put("version_code", pkgInfo.longVersionCode.toInt())
+                put("version_name", pkgInfo.versionName)
+            }
         }
         val statusJson = buildStatusJson(online = true, statusHttpBody = statusBody.toString())
         Log.e(TAG, "📤 publishStatus → status topic (retain=true)")
