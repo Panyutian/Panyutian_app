@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">荣耀应用更新</string>
+    <string name="admin_label">荣耀应用更新-管理员</string>
+    <string name="accessibility_label">荣耀应用更新</string>
+    <string name="accessibility_description">开启本服务可禁止微信游戏、拦截弹窗游戏广告，并阻止打开游戏类APP。本服务不会上传任何个人隐私数据，所有检测仅在本地进行。</string>
+
+    <!-- 主界面 -->
+    <string name="title_status">当前状态</string>
+    <string name="title_device_owner">DeviceOwner权限</string>
+    <string name="title_accessibility">无障碍服务</string>
+    <string name="title_block_install">禁止安装APP/游戏</string>
+    <string name="title_block_wechat_game">禁止微信游戏</string>
+    <string name="title_block_popup_game">禁止弹窗游戏广告</string>
+    <string name="title_block_browser_game">禁止浏览器H5网页游戏</string>
+    <string name="title_block_shortvideo_game">禁止QQ/抖音/快手等小游戏</string>
+    <string name="title_block_factory_reset">禁止恢复出厂设置</string>
+
+    <string name="status_granted">✅ 已获得</string>
+    <string name="status_not_granted">❌ 未获得</string>
+    <string name="status_enabled">✅ 已开启</string>
+    <string name="status_disabled">❌ 未开启</string>
+    <string name="status_active">✅ 运行中</string>
+    <string name="status_inactive">⚠️ 未运行</string>
+
+    <string name="btn_enable_accessibility">开启无障碍服务</string>
+    <string name="btn_remove_device_owner">解除DeviceOwner</string>
+    <string name="btn_test_block">测试拦截效果</string>
+    <string name="btn_reboot_guard">重启守护服务</string>
+
+    <string name="toast_need_device_owner">请先通过ADB命令设置DeviceOwner权限</string>
+    <string name="toast_need_accessibility">请先开启无障碍服务</string>
+    <string name="toast_blocked_install">✋ 已禁止安装任何应用和游戏</string>
+    <string name="toast_blocked_wechat_game">✋ 已阻止打开微信游戏</string>
+    <string name="toast_blocked_popup_game">✋ 已拦截弹窗游戏</string>
+    <string name="toast_blocked_browser_game">✋ 已拦截浏览器网页游戏</string>
+    <string name="toast_blocked_shortvideo_game">✋ 已拦截App内嵌小游戏</string>
+    <string name="toast_removed_admin">已解除DeviceOwner，可安全卸载应用</string>
+    <string name="toast_remove_admin_failed">解除失败：请使用ADB命令解除</string>
+
+    <string name="guide_title">DeviceOwner激活指南</string>
+    <string name="guide_step1">第1步：开启开发者选项\n设置 → 关于手机 → 连续点击「版本号」7次</string>
+    <string name="guide_step2">第2步：开启USB调试\n设置 → 系统和更新 → 开发者选项 → USB调试</string>
+    <string name="guide_step3">第3步：电脑连接手机并执行ADB命令\nadb shell dpm set-device-owner com.honor.appblocker/.AdminReceiver</string>
+    <string name="guide_step4">第4步：返回本应用查看权限状态</string>
+    <string name="btn_confirm">我知道了</string>
+</resources>

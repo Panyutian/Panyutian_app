@@ -1,0 +1,2 @@
+include ':child', ':parent'
+rootProject.name = "HonorAppBlocker"

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 设备管理员策略声明 -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <!-- 限制使用 - 禁止安装/卸载应用 -->
+        <limit-password />
+        <watch-login />
+        <reset-password />
+        <force-lock />
+        <wipe-data />
+        <expire-password />
+        <encrypted-storage />
+        <disable-camera />
+        <disable-keyguard-features />
+
+        <!-- Device Owner 额外策略 -->
+        <set-global-proxy />
+    </uses-policies>
+</device-admin>
