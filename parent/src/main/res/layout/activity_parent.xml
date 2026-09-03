@@ -405,21 +405,13 @@
             android:textSize="15sp"
             app:backgroundTint="#43A047" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAppHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="👀 查看孩子APP使用动态"
-            android:textSize="15sp"
-            app:backgroundTint="#EF6C00" />
-
+        <!-- APP 清单紧跟扫描按钮下方 -->
         <LinearLayout
             android:id="@+id/llAppList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tvAppListHint"
@@ -429,6 +421,15 @@
             android:textSize="13sp"
             android:textColor="#888888"
             android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAppHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="👀 查看孩子APP使用动态"
+            android:textSize="15sp"
+            app:backgroundTint="#EF6C00" />
 
         <!-- ============ v3.0.1: 家长远程推送孩子端更新 ============ -->
         <View
