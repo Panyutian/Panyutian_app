@@ -22,6 +22,9 @@ upload_log.txt
 upload.txt
 *.log
 
+# ===== 本地脚本（DeviceOwner激活等，与更新无关）=====
+scripts/
+
 # ===== 本地文档（不公开，只本地保存）=====
 docs/
 
