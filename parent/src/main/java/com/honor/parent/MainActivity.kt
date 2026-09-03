@@ -639,7 +639,11 @@ class MainActivity : AppCompatActivity() {
                             .show()
                     }
                 } else if (!silent) {
-                    val msg = error.ifEmpty { "HTTP $httpCode" }
+                    // v22: error 字段为空时，从 body 的 JSON 里提取具体错误原因，不再只显示 "HTTP 500"
+                    val msg = error.ifEmpty {
+                        runCatching { JSONObject(body).optString("error", "") }
+                            .getOrDefault("")
+                    }.ifEmpty { "HTTP $httpCode" }
                     val errText = "❌ 失败: $msg"
                     binding.tvStatus.text = errText
                     lastStatusText = errText

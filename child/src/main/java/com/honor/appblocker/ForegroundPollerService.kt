@@ -973,25 +973,34 @@ class ForegroundPollerService : Service() {
 
         /** 列出所有第三方 APP + 被隐藏状态，返回 JSON */
         private fun listInstalledApps(): String {
-            return runCatching {
-                val pm = service.packageManager
-                val apps = pm.getInstalledApplications(android.content.pm.PackageManager.GET_META_DATA)
-                    .filter { !isSystemApp(it.packageName, pm) }
-                    .filter { it.packageName != service.packageName }
-                    .map { app ->
-                        // 🔧 JSONObject.quote 转义所有特殊字符（引号/反斜杠/换行/控制字符），
-                        // 防止某个 APP 名称含特殊符号时毁掉整个 JSON，导致家长端解析失败
-                        val labelJson = runCatching { JSONObject.quote(pm.getApplicationLabel(app).toString()) }
-                            .getOrDefault(JSONObject.quote(app.packageName))
-                        val hidden = AdminReceiver.isAppHidden(service, app.packageName)
-                        """{"package":"${app.packageName}","label":$labelJson,"hidden":$hidden}"""
-                    }
-                val hiddenCount = apps.count { it.contains("\"hidden\":true") }
-                val json = """{"ok":true,"count":${apps.size},"hidden_count":$hiddenCount,"apps":[${apps.joinToString(",")}]}"""
-                buildResponse(200, json)
-            }.getOrElse {
-                buildResponse(500, """{"error":"列出APP失败: ${it.message}"}""")
+            // v22: 包管理器在 binder 压力下可能返回不完整结果（"only received X of 333"），最多重试 3 次
+            var lastErr: String? = null
+            repeat(3) { attempt ->
+                val result = runCatching {
+                    val pm = service.packageManager
+                    val apps = pm.getInstalledApplications(android.content.pm.PackageManager.GET_META_DATA)
+                        .filter { !isSystemApp(it.packageName, pm) }
+                        .filter { it.packageName != service.packageName }
+                        .map { app ->
+                            // 🔧 JSONObject.quote 转义所有特殊字符（引号/反斜杠/换行/控制字符），
+                            // 防止某个 APP 名称含特殊符号时毁掉整个 JSON，导致家长端解析失败
+                            val labelJson = runCatching { JSONObject.quote(pm.getApplicationLabel(app).toString()) }
+                                .getOrDefault(JSONObject.quote(app.packageName))
+                            val hidden = AdminReceiver.isAppHidden(service, app.packageName)
+                            """{"package":"${app.packageName}","label":$labelJson,"hidden":$hidden}"""
+                        }
+                    val hiddenCount = apps.count { it.contains("\"hidden\":true") }
+                    val json = """{"ok":true,"count":${apps.size},"hidden_count":$hiddenCount,"apps":[${apps.joinToString(",")}]}"""
+                    buildResponse(200, json)
+                }
+                result.onSuccess { return it }
+                result.onFailure {
+                    lastErr = it.message
+                    Log.w(TAG, "listInstalledApps 第 ${attempt + 1} 次失败: ${it.message}")
+                    Thread.sleep(300)
+                }
             }
+            return buildResponse(500, """{"error":"列出APP失败: $lastErr"}""")
         }
 
         /** 粗略判断是否系统 APP */

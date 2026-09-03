@@ -38,6 +38,11 @@ class MqttBridge(private val context: Context) {
 
     var cmdHandler: ((path: String, params: Map<String, String>) -> String)? = null
 
+    // v22: 已处理命令的 req_id → 处理时间戳。防止重复订阅堆叠导致同一条命令执行几十次，
+    // 压垮 PackageManager（"only received 63 of 333"）。5 分钟前的记录自动清理。
+    private val processedReqIds = java.util.Collections.synchronizedMap(LinkedHashMap<String, Long>())
+    private val REQ_ID_TTL_MS = 5 * 60_000L
+
     private fun parseBrokerUrl(url: String): Pair<String, Int> {
         val withoutScheme = url.substringAfter("://", url)
         val parts = withoutScheme.split(":")
@@ -185,6 +190,24 @@ class MqttBridge(private val context: Context) {
         val reqId = json.optString("req_id", "")
         val cmd = json.optString("cmd", "")
         val paramsObj = json.optJSONObject("params") ?: JSONObject()
+
+        // v22: req_id 幂等去重 —— 同一条命令（重订阅堆叠/消息重复投递）只执行一次，
+        // 避免几十个线程并发调用 PackageManager 导致 "only received X of 333" 部分失败。
+        if (reqId.isNotEmpty()) {
+            val now = System.currentTimeMillis()
+            // 清理 5 分钟前的过期记录
+            synchronized(processedReqIds) {
+                val it = processedReqIds.entries.iterator()
+                while (it.hasNext()) {
+                    if (now - it.next().value > REQ_ID_TTL_MS) it.remove() else break
+                }
+            }
+            if (processedReqIds.containsKey(reqId)) {
+                Log.w(TAG, "⏭️ 重复命令已忽略: cmd=$cmd reqId=$reqId（订阅堆叠去重）")
+                return
+            }
+            processedReqIds[reqId] = now
+        }
 
         Log.e(TAG, "▶️ CMD 解析: cmd=$cmd reqId=$reqId")
 
