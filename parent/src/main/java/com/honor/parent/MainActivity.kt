@@ -1087,7 +1087,7 @@ class MainActivity : AppCompatActivity() {
             hint = "输入连接密码"
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
             setPadding(48, 24, 48, 24)
-            setTextColor(Color.WHITE)
+            setTextColor(Color.BLACK)
         }
         AlertDialog.Builder(this)
             .setTitle("📝 密码验证")
