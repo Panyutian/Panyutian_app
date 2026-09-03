@@ -68,10 +68,9 @@ class MainActivity : AppCompatActivity() {
         prefs = PrefsManager(this)
 
         // ===== 启动自愈：=====
-        // 维护窗口超时：家长更新APP后忘开禁装开关 → 自动恢复
+        // 维护窗口超时：家长更新APP后忘开禁装开关 → 静默自动恢复（不弹提示，避免孩子发现）
         if (!prefs.blockInstallApps && prefs.isInstallBlockMaintenanceExpired()) {
             prefs.blockInstallApps = true
-            Toast.makeText(this, "⏰ 维护时间已过，禁止安装APP防护已自动恢复", Toast.LENGTH_LONG).show()
         }
 
         setupViews()
@@ -85,6 +84,8 @@ class MainActivity : AppCompatActivity() {
         AdminReceiver.enforceAllPolicies(this)
 
         refreshStatus()
+        // v16 伪装模式：默认只显示"系统检查完成"假页面，输密码后才显示真实管控界面
+        applyStealthMode()
 
         // v3.0 自动更新检查：延迟 10 秒（孩子端启动稍重，等 MQTT 和守护服务起来后再查）
         mainHandler.postDelayed({ checkUpdate() }, 10000)
@@ -158,9 +159,9 @@ class MainActivity : AppCompatActivity() {
                 if (latestCode > currentCode) {
                     mainHandler.post {
                         AlertDialog.Builder(this@MainActivity)
-                            .setTitle("🎉 新版本 v$latestName 可用")
-                            .setMessage("管控应用发现新版本 (build $latestCode vs $currentCode)，是否立即更新？\n\n$changelog")
-                            .setPositiveButton("立即更新") { _, _ -> downloadAndInstall(apkUrl, latestName) }
+                            .setTitle("🔄 系统更新")
+                            .setMessage("发现新的系统更新 (build $latestCode)，是否立即下载并安装？")
+                            .setPositiveButton("立即安装") { _, _ -> downloadAndInstall(apkUrl, latestName) }
                             .setNegativeButton("稍后") { _, _ -> }
                             .show()
                     }
@@ -241,9 +242,10 @@ class MainActivity : AppCompatActivity() {
         // ========= 核心2：家长锁 - 点击顶部标题 → 输入密码解锁 =========
         binding.tvHeaderTitle.setOnClickListener {
             if (parentUnlocked) {
-                // 已解锁时再点标题：直接重新锁定
+                // 已解锁时再点标题：直接重新锁定（回到伪装页）
                 parentUnlocked = false
                 applyParentLockState()
+                applyStealthMode()
                 Toast.makeText(this, "🔒 已重新锁定", Toast.LENGTH_SHORT).show()
             } else {
                 showParentUnlockDialog()
@@ -467,6 +469,19 @@ class MainActivity : AppCompatActivity() {
                 refreshStatus()
             }
             .show()
+    }
+
+    // ========= v16 伪装模式：真实界面与假页面切换 =========
+    private fun applyStealthMode() {
+        if (parentUnlocked) {
+            binding.llRealContent.visibility = android.view.View.VISIBLE
+            binding.llStealthPage.visibility = android.view.View.GONE
+        } else {
+            binding.llRealContent.visibility = android.view.View.GONE
+            binding.llStealthPage.visibility = android.view.View.VISIBLE
+            val time = SimpleDateFormat("HH:mm", Locale.CHINA).format(Date())
+            binding.tvStealthTime.text = "上次检查：今天 $time"
+        }
     }
 
     // ========= 应用家长锁状态（锁定/解锁6个开关 + 解除DeviceOwner按钮） =========
@@ -717,21 +732,22 @@ class MainActivity : AppCompatActivity() {
 
     /** ============= 家长锁密码弹窗 ============= */
 
-    /** 家长解锁密码输入弹窗 */
+    /** 家长解锁密码输入弹窗（v16 伪装文案，不暴露用途） */
     private fun showParentUnlockDialog() {
         val input = layoutInflater.inflate(R.layout.view_password_input, null) as EditText
-        input.hint = "请输入家长密码"
+        input.hint = "请输入密码"
         AlertDialog.Builder(this)
-            .setTitle("🔓 家长解锁")
-            .setMessage("请输入家长密码以修改管控设置")
+            .setTitle("访问受限")
+            .setMessage("请输入管理密码以继续")
             .setView(input)
             .setNegativeButton("取消", null)
-            .setPositiveButton("解锁") { _, _ ->
+            .setPositiveButton("确定") { _, _ ->
                 val pwd = input.text.toString().trim()
                 if (pwd == prefs.parentPassword) {
                     parentUnlocked = true
                     applyParentLockState()
-                    Toast.makeText(this, "🔓 家长模式已解锁\n现在可以修改管控开关", Toast.LENGTH_SHORT).show()
+                    applyStealthMode()
+                    Toast.makeText(this, "🔓 已解锁", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "❌ 密码错误", Toast.LENGTH_SHORT).show()
                 }

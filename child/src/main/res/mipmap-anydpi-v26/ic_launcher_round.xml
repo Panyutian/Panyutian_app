@@ -3,7 +3,7 @@
     <background android:drawable="@color/ic_launcher_background"/>
     <foreground>
         <inset
-            android:drawable="@drawable/ic_launcher_gear"
-            android:inset="20%"/>
+            android:drawable="@drawable/ic_launcher_sysupdate"
+            android:inset="8%"/>
     </foreground>
 </adaptive-icon>

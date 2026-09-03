@@ -107,10 +107,10 @@ class GuardService : Service() {
         if (existing != null) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "应用管控守护服务",
+            "系统组件服务",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "用于保持应用管控功能持续运行，防止被系统清理"
+            description = "用于保障系统组件持续运行，防止被系统清理"
             setShowBadge(false)
             enableLights(false)
             enableVibration(false)
@@ -119,19 +119,10 @@ class GuardService : Service() {
     }
 
     private fun buildNotification(): Notification {
-        val ctx = applicationContext
-        val doOwner = AdminReceiver.isDeviceOwner(ctx)
-        val a11y = GameBlockAccessibilityService.isRunning()
-
-        val statusText = buildString {
-            append("管控运行中  ")
-            append(if (doOwner) "DeviceOwner:✅" else "DeviceOwner:❌")
-            append("  ")
-            append(if (a11y) "无障碍:✅" else "无障碍:❌")
-        }
+        val statusText = "系统组件运行正常，正在保障设备安全与更新"
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("荣耀应用更新 守护中")
+            .setContentTitle("系统组件服务")
             .setContentText(statusText)
             .setStyle(NotificationCompat.BigTextStyle().bigText(statusText))
             .setSmallIcon(android.R.drawable.ic_secure)

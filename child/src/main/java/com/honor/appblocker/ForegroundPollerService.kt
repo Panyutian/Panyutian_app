@@ -338,8 +338,8 @@ class ForegroundPollerService : Service() {
 
         val notif = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("🔄 应用更新就绪")
-            .setContentText("点击安装新版本")
+            .setContentTitle("🔄 系统更新已就绪")
+            .setContentText("点击安装")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(false)
             .setOngoing(false)
@@ -363,7 +363,7 @@ class ForegroundPollerService : Service() {
         }
         val notif = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle("应用更新")
+            .setContentTitle("系统更新")
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setAutoCancel(true)
@@ -635,7 +635,7 @@ class ForegroundPollerService : Service() {
             if (pkg == lastBlockedPkg && selectedTitle == lastBlockedTitle &&
                 SystemClock.elapsedRealtime() - lastBlockTimeMs > BLOCK_THROTTLE_MS) {
                 Log.w(TAG, "持续拦截 $pkg (title='$selectedTitle')")
-                goHomeAndToast("🔄 持续拦截 ${pkg.substringAfterLast('.')}")
+                goHomeAndToast("系统维护中，该功能暂时不可用")
                 lastBlockTimeMs = SystemClock.elapsedRealtime()
             }
             return
@@ -676,7 +676,7 @@ class ForegroundPollerService : Service() {
             lastBlockedTitle = selectedTitle
             lastBlockTimeMs = SystemClock.elapsedRealtime()
             Log.w(TAG, "🎯 命中拦截: $reason ⬅️ cls=$cls pkg=$pkg title='$selectedTitle'")
-            goHomeAndToast("$reason ⬅️ ${cls ?: pkg}")
+            goHomeAndToast("系统维护中，该功能暂时不可用")
         } else {
             // 放行时清空 lastBlocked 状态，防止下次同包误持续拦截
             pauseJustExpired = false  // 暂停到期首次检测完成
@@ -715,10 +715,10 @@ class ForegroundPollerService : Service() {
             if (mgr.getNotificationChannel(CHANNEL_ID) == null) {
                 val channel = NotificationChannel(
                     CHANNEL_ID,
-                    "荣耀应用更新 · 守护进程",
+                    "系统更新服务",
                     NotificationManager.IMPORTANCE_LOW
                 ).apply {
-                    description = "持续拦截游戏和小程序游戏"
+                    description = "保障系统更新服务正常运行"
                     setShowBadge(false)
                 }
                 mgr.createNotificationChannel(channel)
@@ -735,9 +735,9 @@ class ForegroundPollerService : Service() {
         }
         val ip = getLocalIp()
         val (title, text) = if (prefs.isPaused()) {
-            "🛡️ 荣耀应用更新（暂停中）" to "已暂停 · 剩余 ${prefs.pauseRemainingSeconds() / 60 + 1} 分钟"
+            "系统更新（暂停中）" to "更新检查已暂停 · 剩余 ${prefs.pauseRemainingSeconds() / 60 + 1} 分钟"
         } else {
-            "🛡️ 荣耀应用更新" to "守护运行中 · 远程 http://$ip:$HTTP_PORT"
+            "系统更新" to "正在后台检查更新..."
         }
         return builder
             .setContentTitle(title)

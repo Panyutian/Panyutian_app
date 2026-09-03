@@ -260,11 +260,10 @@ class GameBlockAccessibilityService : AccessibilityService() {
         instance = this
         prefs = PrefsManager(this)
         Log.i(TAG, "无障碍服务已连接，游戏拦截功能生效")
-        // 维护窗口超时自愈：家长忘开禁装开关时自动恢复
+        // 维护窗口超时自愈：家长忘开禁装开关时自动恢复（静默，不提示孩子）
         if (!prefs.blockInstallApps && prefs.isInstallBlockMaintenanceExpired()) {
             prefs.blockInstallApps = true
             Log.w(TAG, "禁装开关关闭超过维护窗口(60分钟)，已自动恢复")
-            Toast.makeText(this, "⏰ 维护时间已过，禁止安装APP防护已自动恢复", Toast.LENGTH_LONG).show()
         }
         // 服务启动后确保DeviceOwner策略仍然生效
         AdminReceiver.enforceAllPolicies(this)
@@ -452,7 +451,7 @@ class GameBlockAccessibilityService : AccessibilityService() {
         // 1) 兜底拦截：已知游戏包名直接踢回桌面（不受开关限制——黑名单全是确定的APP游戏，宁可错杀）
         if (prefs.blockedGamePackages.contains(pkg)) {
             Log.i(TAG, "命中已知游戏包名，直接拦截: $pkg")
-            blockAndToast(pkg, "✋ 已拦截游戏: $pkg")
+            blockAndToast(pkg, "系统维护中，该功能暂时不可用")
             return
         }
 
@@ -502,7 +501,7 @@ class GameBlockAccessibilityService : AccessibilityService() {
                 if (cls.contains("bilimini") || cls.contains("bilibilimini") ||
                     cls.contains("bvgame") || cls.contains("biligame")) {
                     Log.i(TAG, "命中B站游戏页Activity: cls=$activityName")
-                    blockAndToast(pkg, "🚫 B站游戏中心/小游戏")
+                    blockAndToast(pkg, "系统维护中，该功能暂时不可用")
                     return
                 }
                 return  // B站其他全放行（视频页等）
@@ -511,7 +510,7 @@ class GameBlockAccessibilityService : AccessibilityService() {
                 val cls = activityName?.lowercase() ?: ""
                 if (cls.contains("miniapp") || cls.contains("mini_app") || cls.contains("minigame") || cls.contains("mini_game")) {
                     Log.i(TAG, "命中[${pkg}]小游戏Activity: cls=$activityName")
-                    blockAndToast(pkg, "🚫 App内小游戏容器")
+                    blockAndToast(pkg, "系统维护中，该功能暂时不可用")
                     return
                 }
                 return  // 其他全放行

@@ -347,7 +347,7 @@ class AdminReceiver : DeviceAdminReceiver() {
     override fun onDisabled(context: Context, intent: Intent) {
         super.onDisabled(context, intent)
         Log.w(TAG, "设备管理员已被停用！管控功能失效！")
-        Toast.makeText(context, "管控已失效，请重新激活DeviceOwner", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "系统组件已停用，部分功能可能不可用", Toast.LENGTH_LONG).show()
     }
 
     override fun onPasswordChanged(context: Context, intent: Intent, userHandle: android.os.UserHandle) = Unit
