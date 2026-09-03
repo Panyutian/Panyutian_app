@@ -4,12 +4,12 @@
     "versionCode": 12,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0.apk",
-    "changelog": "• 全新机器人图标\n• 启动自动检查更新"
+    "changelog": "• 全新机器人图标\n• 启动自动检查更新\n• 新增查看孩子APP使用动态"
   },
   "child": {
     "versionCode": 12,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
-    "changelog": "• 全新机器人图标\n• 支持家长端远程推送更新"
+    "changelog": "• 全新机器人图标\n• 支持家长端远程推送更新\n• 记录APP打开历史供家长查看"
   }
 }
