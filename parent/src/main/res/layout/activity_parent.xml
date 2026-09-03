@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -485,4 +489,55 @@
             android:textColor="#666666" />
 
     </LinearLayout>
-</ScrollView>
+    </ScrollView>
+
+    <!-- v26: 家长端启动认证锁覆盖层 -->
+    <LinearLayout
+        android:id="@+id/lockOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:background="#FFFFFFFF"
+        android:visibility="visible">
+
+        <TextView
+            android:text="🛡️"
+            android:textSize="64sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:text="家长控制端"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:text="请验证身份以继续"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBiometricAuth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔑 使用指纹/人脸验证"
+            android:textSize="15sp"
+            app:backgroundTint="#1976D2"
+            android:layout_marginBottom="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPasswordAuth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📝 使用密码验证"
+            android:textSize="14sp"
+            style="?attr/materialButtonOutlinedStyle"
+            app:backgroundTint="#666666" />
+
+    </LinearLayout>
+
+</FrameLayout>

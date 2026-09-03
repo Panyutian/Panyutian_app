@@ -19,6 +19,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.honor.parent.databinding.ActivityParentBinding
@@ -27,6 +30,7 @@ import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 
 /**
@@ -60,6 +64,8 @@ class MainActivity : AppCompatActivity() {
     private var currentBlockInstall = true  // 缓存禁止安装开关状态（默认禁止）
     private var pauseExpireNotified = false  // 暂停倒计时归零后是否已主动拉过 status
     private var lockExpireNotified = false   // 锁屏倒计时归零后是否已主动拉过 status
+    // v26: 启动认证锁
+    private var isUnlocked = false
 
     companion object {
         private const val MODE_MQTT = "mqtt"
@@ -70,6 +76,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityParentBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // v26: 启动认证锁 —— 先锁住，认证通过后才继续初始化
+        setupAuthLock()
 
         // v19: 标题显示当前版本号（直接读系统 PackageManager，和实际安装版本永远一致）
         runCatching {
@@ -1014,6 +1023,95 @@ class MainActivity : AppCompatActivity() {
             et.setBackgroundColor(Color.TRANSPARENT)
             btn.text = "🔒 锁定"
             btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FF9800"))
+        }
+    }
+
+    // ============ v26: 家长端启动认证锁 ============
+
+    private fun setupAuthLock() {
+        binding.btnBiometricAuth.setOnClickListener { tryBiometricAuth() }
+        binding.btnPasswordAuth.setOnClickListener { showPasswordAuthDialog() }
+
+        // 自动尝试指纹/人脸（如果设备支持）
+        val biometricManager = BiometricManager.from(this)
+        val canAuthenticate = biometricManager.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        )
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            binding.btnBiometricAuth.visibility = View.VISIBLE
+            // 延迟自动弹出指纹框（让界面先渲染）
+            handler.postDelayed({ tryBiometricAuth() }, 500)
+        } else {
+            // 不支持指纹，隐藏按钮，只留密码
+            binding.btnBiometricAuth.visibility = View.GONE
+        }
+    }
+
+    private fun tryBiometricAuth() {
+        val executor = ContextCompat.getMainExecutor(this)
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    runOnUiThread { unlockApp() }
+                }
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    // 用户取消或不支持 → 不自动弹密码框，让用户手动点
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("🛡️ 家长控制端")
+            .setSubtitle("请验证身份以继续")
+            .setNegativeButtonText("使用密码")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun showPasswordAuthDialog() {
+        val savedPwd = prefs.getString("pwd", "") ?: ""
+        val input = EditText(this).apply {
+            hint = "输入连接密码"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            setPadding(48, 24, 48, 24)
+            setTextColor(Color.BLACK)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("📝 密码验证")
+            .setView(input)
+            .setPositiveButton("验证") { _, _ ->
+                val entered = input.text.toString()
+                // 密码与 MQTT 连接密码复用（和孩子端 parentPassword 一致）
+                if (entered.isNotEmpty() && entered == savedPwd) {
+                    unlockApp()
+                } else {
+                    toast("❌ 密码错误")
+                }
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    private fun unlockApp() {
+        isUnlocked = true
+        binding.lockOverlay.visibility = View.GONE
+        toast("✅ 验证通过")
+    }
+
+    // v26: 切后台再回来 → 重新锁
+    override fun onResume() {
+        super.onResume()
+        if (!isUnlocked && binding.lockOverlay.visibility != View.VISIBLE) {
+            binding.lockOverlay.visibility = View.VISIBLE
+        } else if (isUnlocked && binding.lockOverlay.visibility == View.VISIBLE) {
+            binding.lockOverlay.visibility = View.GONE
         }
     }
 }
