@@ -4,12 +4,12 @@
     "versionCode": 5,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0.apk",
-    "changelog": "• v3.0 首发：MQTT 跨网络远程控制\n• 四级按钮（暂停/恢复/锁屏/解锁）\n• 状态卡实时同步"
+    "changelog": "• 全新机器人图标\n• 启动自动检查更新"
   },
   "child": {
-    "versionCode": 6,
+    "versionCode": 11,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
-    "changelog": "• v3.0 首发：DeviceOwner 管控\n• GameBlockMatcher 游戏拦截\n• MQTT + HTTP 双通道远程控制\n• 三级动态轮询低功耗优化"
+    "changelog": "• 全新机器人图标\n• 支持家长端远程推送更新"
   }
 }
