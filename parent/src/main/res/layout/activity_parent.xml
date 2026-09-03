@@ -526,21 +526,22 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBiometricAuth"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="🔑 使用指纹/人脸验证"
             android:textSize="15sp"
+            android:textColor="#FFFFFF"
             app:backgroundTint="#1976D2"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="12dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPasswordAuth"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="📝 使用密码验证"
-            android:textSize="14sp"
-            style="?attr/materialButtonOutlinedStyle"
-            app:backgroundTint="#666666" />
+            android:textSize="15sp"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#43A047" />
 
     </LinearLayout>
 
