@@ -397,6 +397,15 @@
             android:layout_marginBottom="8dp" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAppHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="� 查看孩子APP使用动态"
+            android:textSize="15sp"
+            app:backgroundTint="#EF6C00" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnListApps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -421,15 +430,6 @@
             android:textSize="13sp"
             android:textColor="#888888"
             android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAppHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="👀 查看孩子APP使用动态"
-            android:textSize="15sp"
-            app:backgroundTint="#EF6C00" />
 
         <!-- ============ v3.0.1: 家长远程推送孩子端更新 ============ -->
         <View

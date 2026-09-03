@@ -11,7 +11,7 @@ android {
         applicationId "com.honor.appblocker"
         minSdk rootProject.min_sdk
         targetSdk rootProject.target_sdk
-        versionCode 17
+        versionCode 18
         versionName "3.0"
     }
 
