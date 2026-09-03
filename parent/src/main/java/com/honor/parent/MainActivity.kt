@@ -1033,11 +1033,11 @@ class MainActivity : AppCompatActivity() {
         binding.btnPasswordAuth.setOnClickListener { showPasswordAuthDialog() }
 
         // 自动尝试指纹/人脸（如果设备支持）
+        // 注意：不能加 DEVICE_CREDENTIAL，否则和 setNegativeButtonText 冲突会崩！
         val biometricManager = BiometricManager.from(this)
         val canAuthenticate = biometricManager.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
-            BiometricManager.Authenticators.BIOMETRIC_WEAK or
-            BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            BiometricManager.Authenticators.BIOMETRIC_WEAK
         )
         if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
             binding.btnBiometricAuth.visibility = View.VISIBLE
