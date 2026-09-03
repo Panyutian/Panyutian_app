@@ -10,6 +10,6 @@
     "versionCode": 35,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
-    "changelog": "v35 伪装页长按2秒解锁入口+防误触优化"
+    "changelog": "v35 伪装页按住5秒解锁入口+多线路下载修复"
   }
 }
