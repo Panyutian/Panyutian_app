@@ -582,10 +582,15 @@ class MainActivity : AppCompatActivity() {
                 if (!silent) setButtonsEnabled(true)
                 if (ok && httpCode in 200..299) {
                     try { handleSuccess(cmdName, body) } catch (e: Exception) {
-                        val errText = "❌ 数据处理失败: ${e.message}"
-                        binding.tvStatus.text = errText
-                        lastStatusText = errText
-                        toast(errText)
+                        // 🔧 弹窗显示详细原因 + 数据片段，便于远程排查
+                        val detail = "命令 [$cmdName] 数据处理出错:\n${e.message}\n\n数据开头 200 字符:\n${body.take(200)}"
+                        lastStatusText = "❌ 数据处理失败: ${e.message}"
+                        binding.tvStatus.text = lastStatusText
+                        android.app.AlertDialog.Builder(this@MainActivity)
+                            .setTitle("⚠️ 数据处理失败")
+                            .setMessage(detail)
+                            .setPositiveButton("知道了", null)
+                            .show()
                     }
                 } else if (!silent) {
                     val msg = error.ifEmpty { "HTTP $httpCode" }

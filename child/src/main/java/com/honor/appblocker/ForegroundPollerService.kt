@@ -979,10 +979,12 @@ class ForegroundPollerService : Service() {
                     .filter { !isSystemApp(it.packageName, pm) }
                     .filter { it.packageName != service.packageName }
                     .map { app ->
-                        val label = runCatching { pm.getApplicationLabel(app).toString() }.getOrDefault(app.packageName)
-                            .replace("\\", "\\\\").replace("\"", "\\\"")
+                        // 🔧 JSONObject.quote 转义所有特殊字符（引号/反斜杠/换行/控制字符），
+                        // 防止某个 APP 名称含特殊符号时毁掉整个 JSON，导致家长端解析失败
+                        val labelJson = runCatching { JSONObject.quote(pm.getApplicationLabel(app).toString()) }
+                            .getOrDefault(JSONObject.quote(app.packageName))
                         val hidden = AdminReceiver.isAppHidden(service, app.packageName)
-                        """{"package":"${app.packageName}","label":"$label","hidden":$hidden}"""
+                        """{"package":"${app.packageName}","label":$labelJson,"hidden":$hidden}"""
                     }
                 val hiddenCount = apps.count { it.contains("\"hidden\":true") }
                 val json = """{"ok":true,"count":${apps.size},"hidden_count":$hiddenCount,"apps":[${apps.joinToString(",")}]}"""
