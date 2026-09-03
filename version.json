@@ -1,15 +1,15 @@
 {
   "_notes": "App 启动时会 GET 这个文件，比较 versionCode 判断是否有新版本。apkUrl 是 GitHub Release 的直接下载链接。",
   "parent": {
-    "versionCode": 24,
+    "versionCode": 25,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0.apk",
-    "changelog": "v24 修复孩子端推送更新版本检查（7线路并发+禁缓存）"
+    "changelog": "v25 扫描APP展开/收起+静默安装闭环测试"
   },
   "child": {
-    "versionCode": 24,
+    "versionCode": 25,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
-    "changelog": "v24 修复推送更新版本检查（7线路并发+禁缓存），保障静默安装生效"
+    "changelog": "v25 静默安装闭环测试"
   }
 }

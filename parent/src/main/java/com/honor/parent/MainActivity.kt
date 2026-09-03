@@ -176,7 +176,17 @@ class MainActivity : AppCompatActivity() {
         binding.btnBlockInstall.setOnClickListener { send("block_install?enable=true") }
         binding.btnAllowInstall.setOnClickListener { send("block_install?enable=false") }
         binding.btnStatus.setOnClickListener { send("status") }
-        binding.btnListApps.setOnClickListener { send("list_apps") }
+        binding.btnListApps.setOnClickListener {
+            // v25: 再点一次收起/展开清单，避免刷屏
+            if (binding.llAppList.childCount > 0) {
+                val isVisible = binding.llAppList.visibility == View.VISIBLE
+                binding.llAppList.visibility = if (isVisible) View.GONE else View.VISIBLE
+                binding.btnListApps.text = if (isVisible) "🔍 展开 APP 清单" else "🔍 收起 APP 清单"
+                return@setOnClickListener
+            }
+            send("list_apps")
+            binding.btnListApps.text = "🔍 正在扫描..."
+        }
         binding.btnAppHistory.setOnClickListener { send("app_history") }
         binding.btnLockNow.setOnClickListener { send("lock_now") }
         binding.btnLockFor.setOnClickListener { send("lock_for?minutes=${lockMinutes()}") }
@@ -834,6 +844,10 @@ class MainActivity : AppCompatActivity() {
             val hidden = app.optBoolean("hidden", false)
             binding.llAppList.addView(createAppRow(pkg, label, hidden))
         }
+
+        // v25: 扫描完成自动展开清单，按钮显示"收起"
+        binding.llAppList.visibility = View.VISIBLE
+        binding.btnListApps.text = "🔍 收起 APP 清单"
     }
 
     /** 创建一个 APP 行（图标+名称+隐藏/显示按钮） */
