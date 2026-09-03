@@ -242,33 +242,76 @@ class ForegroundPollerService : Service() {
                 if (apkUrl.contains("github.com")) apkUrl = "https://ghfast.top/$apkUrl"
                 android.util.Log.i(TAG, "🔄 下载 APK: $apkUrl")
 
-                // Step 3: 下载 APK
+                // Step 3: 下载 APK（存到应用私有目录，无需存储权限，PackageInstaller 直接用文件描述符）
                 val dlConn = URL(apkUrl).openConnection() as HttpURLConnection
-                dlConn.connectTimeout = 15000; dlConn.readTimeout = 60000
+                dlConn.connectTimeout = 15000; dlConn.readTimeout = 90000
                 dlConn.instanceFollowRedirects = true
                 dlConn.connect()
 
-                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                tempFile = File(downloadsDir, "HonorAppBlocker-child-update.apk")
+                val updatesDir = File(getExternalFilesDir(null) ?: filesDir, "updates").apply { mkdirs() }
+                tempFile = File(updatesDir, "child-update.apk")
                 if (tempFile.exists()) tempFile.delete()
                 tempFile.outputStream().use { dlConn.inputStream.copyTo(it) }
                 dlConn.disconnect()
-                android.util.Log.i(TAG, "🔄 下载完成: ${tempFile!!.absolutePath}")
+                android.util.Log.i(TAG, "🔄 下载完成: ${tempFile!!.absolutePath} 大小=${tempFile.length()}")
 
-                // Step 4: 临时关闭禁装策略
+                // Step 4: 临时关闭禁装策略（兜底，DeviceOwner 静默安装通常不受限）
                 AdminReceiver.setBlockInstallPolicy(this, false)
                 Thread.sleep(800)  // 等 DPM 生效
 
-                // Step 5: 直接拉起系统安装器（DeviceOwner 权限可绕过后台启动限制）
-                val ok = launchInstallerDirectly(tempFile!!)
-                if (!ok) {
-                    // Fallback: 全屏通知方式
-                    installApkViaNotification(tempFile!!)
-                }
+                // Step 5: 优先 DeviceOwner 静默安装（PackageInstaller 会话，无需弹窗）
+                // 失败再退回：直接拉起安装器 → 全屏通知
+                var ok = silentInstallViaPackageInstaller(tempFile!!)
+                if (!ok) ok = launchInstallerDirectly(tempFile!!)
+                if (!ok) installApkViaNotification(tempFile!!)
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "❌ 静默更新失败", e)
                 showUpdateDoneNotification("更新失败: ${e.message}")
             }
+        }
+    }
+
+    /**
+     * v22: DeviceOwner 通过 PackageInstaller 会话 API 静默安装（无需任何弹窗确认）。
+     * 设备/资料所有者调用 session.commit() 时，系统跳过用户确认直接安装，
+     * 结果通过 [SilentUpdateReceiver] 回调。
+     * @return true 表示已成功提交安装会话（最终成功与否看接收器回调）
+     */
+    private fun silentInstallViaPackageInstaller(apkFile: File): Boolean {
+        return runCatching {
+            if (!AdminReceiver.isDeviceOwner(this)) {
+                android.util.Log.w(TAG, "非 DeviceOwner，跳过静默安装")
+                return false
+            }
+            val installer = packageManager.packageInstaller
+            val params = android.content.pm.PackageInstaller.SessionParams(
+                android.content.pm.PackageInstaller.SessionParams.MODE_FULL_INSTALL
+            ).apply {
+                setAppPackageName(packageName)
+            }
+            val sessionId = installer.createSession(params)
+            android.util.Log.i(TAG, "📦 PackageInstaller 会话已创建 id=$sessionId")
+            installer.openSession(sessionId).use { session ->
+                apkFile.inputStream().use { input ->
+                    session.openWrite("child_update", 0, apkFile.length()).use { out ->
+                        input.copyTo(out)
+                        session.fsync(out)
+                    }
+                }
+                val statusIntent = Intent(this, SilentUpdateReceiver::class.java).apply {
+                    action = "com.honor.appblocker.INSTALL_STATUS"
+                }
+                val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+                        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0)
+                val pending = PendingIntent.getBroadcast(this, 0, statusIntent, flags)
+                // commit 后系统静默安装，设备所有者无需用户确认；结果回调到 SilentUpdateReceiver
+                session.commit(pending.intentSender)
+            }
+            android.util.Log.i(TAG, "📦 PackageInstaller 已提交静默安装（设备所有者免确认）")
+            true
+        }.getOrElse {
+            android.util.Log.e(TAG, "❌ PackageInstaller 静默安装失败: ${it.message}", it)
+            false
         }
     }
 

@@ -92,6 +92,11 @@
             </intent-filter>
         </receiver>
 
+        <!-- v22: PackageInstaller 静默安装结果回调（DeviceOwner 免弹窗更新） -->
+        <receiver
+            android:name=".SilentUpdateReceiver"
+            android:exported="false" />
+
         <!-- 前台守护服务，防止被系统杀死 -->
         <service
             android:name=".GuardService"
