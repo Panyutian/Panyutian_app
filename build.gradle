@@ -1,4 +1,14 @@
 // 项目级 build.gradle
+import groovy.json.JsonSlurper
+
+// 从 version.json 读取版本号，以后只改这一个文件就行
+def versionJsonFile = rootProject.file('version.json')
+def versionJson = new JsonSlurper().parseText(versionJsonFile.text)
+ext.parentVersionCode = versionJson.parent.versionCode
+ext.parentVersionName = versionJson.parent.versionName
+ext.childVersionCode = versionJson.child.versionCode
+ext.childVersionName = versionJson.child.versionName
+
 buildscript {
     ext {
         compile_sdk = 34

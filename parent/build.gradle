@@ -11,8 +11,8 @@ android {
         applicationId "com.honor.parent"
         minSdk rootProject.min_sdk
         targetSdk rootProject.target_sdk
-        versionCode 33
-        versionName "3.0"
+        versionCode rootProject.parentVersionCode
+        versionName rootProject.parentVersionName
     }
 
     buildTypes {
