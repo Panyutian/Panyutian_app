@@ -1032,20 +1032,26 @@ class MainActivity : AppCompatActivity() {
         binding.btnBiometricAuth.setOnClickListener { tryBiometricAuth() }
         binding.btnPasswordAuth.setOnClickListener { showPasswordAuthDialog() }
 
-        // 自动尝试指纹/人脸（如果设备支持）
-        // 注意：不能加 DEVICE_CREDENTIAL，否则和 setNegativeButtonText 冲突会崩！
         val biometricManager = BiometricManager.from(this)
         val canAuthenticate = biometricManager.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
             BiometricManager.Authenticators.BIOMETRIC_WEAK
         )
+        val hasPassword = (prefs.getString("pwd", "") ?: "").isNotEmpty()
+
         if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            // 有指纹/人脸 → 自动弹生物识别框
             binding.btnBiometricAuth.visibility = View.VISIBLE
-            // 延迟自动弹出指纹框（让界面先渲染）
             handler.postDelayed({ tryBiometricAuth() }, 500)
-        } else {
-            // 不支持指纹，隐藏按钮，只留密码
+        } else if (hasPassword) {
+            // 无生物识别但有密码 → 自动弹密码框
             binding.btnBiometricAuth.visibility = View.GONE
+            handler.postDelayed({ showPasswordAuthDialog() }, 500)
+        } else {
+            // 无生物识别也无密码 → 首次使用，跳过认证直接进入
+            binding.btnBiometricAuth.visibility = View.GONE
+            handler.postDelayed({ unlockApp() }, 300)
+            toast("⚠️ 未设置连接密码，建议尽快设置以保障安全")
         }
     }
 
@@ -1081,7 +1087,7 @@ class MainActivity : AppCompatActivity() {
             hint = "输入连接密码"
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
             setPadding(48, 24, 48, 24)
-            setTextColor(Color.BLACK)
+            setTextColor(Color.WHITE)
         }
         AlertDialog.Builder(this)
             .setTitle("📝 密码验证")
