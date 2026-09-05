@@ -1,15 +1,15 @@
 {
   "_notes": "App 启动时会 GET 这个文件，比较 versionCode 判断是否有新版本。apkUrl 是 GitHub Release 的直接下载链接。",
   "parent": {
-    "versionCode": 40,
-    "versionName": "3.0",
-    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0.apk",
-    "changelog": "v40 控制模式界面精简：绑定设备号改为绿色长按钮折叠面板，移除在线状态下方的MQTT调试信息输出"
+    "versionCode": 41,
+    "versionName": "4.0",
+    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-4.0.apk",
+    "changelog": "v4.0 家长控制端全新版本号；控制模式界面精简（绿色长按钮折叠绑定面板、移除调试信息）"
   },
   "child": {
-    "versionCode": 39,
+    "versionCode": 40,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
-    "changelog": "v39 VPN与游戏拦截联动：恢复拦截自动开VPN、暂停拦截自动关VPN并清理微信进程；修复反复开关VPN导致断网问题"
+    "changelog": "v40 修复关闭VPN时孩子端闪退；暂停到期自动恢复：联动开VPN+强制回桌面+清理微信/QQ进程，游戏不再暂停结束后继续玩"
   }
 }
