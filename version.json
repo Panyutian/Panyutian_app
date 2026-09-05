@@ -7,7 +7,7 @@
     "changelog": "v36 家长端新增系统维护区：远程一键锁死/开放开发者模式"
   },
   "child": {
-    "versionCode": 37,
+    "versionCode": 36,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0.apk",
     "changelog": "v37 新增相机远程禁用策略（默认允许使用，家长可远程开关）+修复相机管控未生效的问题"
