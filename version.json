@@ -1,12 +1,16 @@
 {
-  "_notes": "versionCode/versionName 两端共用，始终保持同步（App 启动时 GET 本文件比较 versionCode 判断是否有新版本）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间（如 3.0-45202609060913）。apkUrl 是 GitHub Release 的直接下载链接。",
+  "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间（如 3.0-45202609060913）。apkUrl 是 GitHub Release 直接下载链接。",
   "versionCode": 45,
   "versionName": "3.0",
   "parent": {
+    "versionCode": 45,
+    "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent-debug-3.0-45202609060913.apk",
     "changelog": "版本号统一为 V3.0-版本码+日期时间；暂停时长支持天/时/分（默认0天0时30分，到点自动拦截）；界面精简：删除控制模式标题和开发者模式状态文字；维护按钮改名（临时开放按钮改为绿色）；回到前台自动重新检查更新"
   },
   "child": {
+    "versionCode": 45,
+    "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child-debug-3.0-45202609060913.apk",
     "changelog": "家长入口仅支持密码解锁（不使用指纹/人脸，防止孩子本人解锁）；修复家长手动关闭VPN后被自动拉起（关闭后保持关闭，被系统杀掉/更新后才自动恢复）；开发者选项按钮功能修复并显示已开启(绿)/已关闭(红)；游戏域名拦截按钮显示已开启(绿)/观察中(橙)/已关闭(红)；VPN自愈；暂停到期自动开VPN+回桌面+清理微信/QQ；暂停最长7天"
   }
