@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 49,
+  "versionCode": 50,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 49,
+    "versionCode": 50,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "顶部标题改为“——守护孩子健康从游戏管控开始——”（第二行Version宋体12sp居中）；修复使用说明上下分隔线的弧形/阴影问题；TIP文案调整；USB/开发者模式切换按钮无投影"
+    "changelog": "标题改为“守护孩子健康从游戏管控开始”（去掉破折号，20sp；第二行Version宋体12sp居中）"
   },
   "child": {
-    "versionCode": 49,
+    "versionCode": 50,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "顶部设备号与局域网IP统一显示在同一区域（14号字，点按复制设备号、长按复制IP，方便粘贴到家长端）；修复息屏后家长端连不上（CPU唤醒锁+WiFi高性能锁+电池白名单引导）；家长入口仅密码解锁；手动关闭VPN后不再被自动拉起；开发者选项与游戏域名拦截按钮实时显示状态颜色"
+    "changelog": "MQTT连接状态行字号改为14sp；顶部设备号与局域网IP统一显示（14号字，点按复制设备号、长按复制IP）；修复息屏后家长端连不上；家长入口仅密码解锁；手动关闭VPN后不再被自动拉起"
   }
 }
