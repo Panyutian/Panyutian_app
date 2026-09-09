@@ -1,18 +1,18 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 64,
+  "versionCode": 65,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 64,
+    "versionCode": 65,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v64两端同步更新：巡航休息弹窗文案改为「我亲爱的小狗田」，按钮背景改为绿色，全局背景改为淡蓝色（与主界面同色系）"
+    "changelog": "v65两端同步更新：巡航弹窗标题改为黄色、按钮改为橙色、背景改为淡绿色；巡航启动不再联动拉起游戏拦截"
   },
   "child": {
-    "versionCode": 64,
+    "versionCode": 65,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "巡航休息弹窗：「我的小主」改为「我亲爱的小狗田」；「知道了，马上休息」按钮背景改为绿色(#43A047)；弹窗全局背景从暖色渐变改为淡蓝色渐变(与主界面bg_page同色系)"
+    "changelog": "巡航弹窗：标题「休息时间到啦」改为黄色(#FFEB3B)；按钮背景改为橙色(#FF6F00)；全局背景改为淡绿色(#E8F5E9)；巡航启动/锁屏不再强制拉起VPN拦截和无障碍服务"
   }
 }
 
