@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 67,
+  "versionCode": 68,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 67,
+    "versionCode": 68,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v67两端同步更新：VPN游戏域名拦截改为默认关闭且不再开机自启/后台自动拉起（需要时在孩子端真界面手动开启）；修复无障碍总开关被系统重置后自愈误判已开启的问题；系统设置自保判定收紧为系统设置包精确名单"
+    "changelog": "v68：①正式更名为「雨田智能护眼管家」——家长端应用名改为护眼管家、启用眼睛Logo新图标、欢迎标语改为守护孩子健康从保护眼睛开始；②修复「禁止安装APP」与「游戏拦截」开关互相干扰的问题，两个功能现已彻底独立互不影响"
   },
   "child": {
-    "versionCode": 67,
+    "versionCode": 68,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "v67：①VPN游戏域名拦截彻底默认关闭——开机不再自启、轮询不再自愈拉起、暂停到期/远程恢复也不会自动启动，仅保留孩子端真界面手动开启入口（想用时再开）；②修复无障碍自检隐患：荣耀系统把无障碍总开关重置为0但服务名残留在列表时，旧逻辑误判已开启导致自愈永不触发，现按总开关+服务名双重校验；③系统设置自保的包名判定从模糊匹配收紧为系统设置包精确名单，第三方App零进入"
+    "changelog": "v68：①正式更名为「雨田智能护眼管家」，孩子端真界面标题同步更新，自保识别兼容新旧名称，对外伪装名不变；②修复「禁止安装APP」与「游戏拦截」开关互相干扰：禁装纯走系统级DeviceOwner限制（安装请求在系统层直接被拒），不再联动无障碍开关，无障碍只归游戏拦截控制，两个功能彻底互不干扰"
   }
 }
