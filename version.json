@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 71,
+  "versionCode": 72,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 71,
+    "versionCode": 72,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v71：配合孩子端修复部分新机型（荣耀平板BVL-AN16等MagicOS新版）权限收紧导致的扫描异常，建议同步更新"
+    "changelog": "v72：配合孩子端修复部分新机型（荣耀平板BVL-AN16等MagicOS新版）权限收紧导致的扫描异常，建议同步更新"
   },
   "child": {
-    "versionCode": 71,
+    "versionCode": 72,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "v71：①修复部分新机型（荣耀平板BVL-AN16等MagicOS新版）【扫描APP列表为空】【APP使用动态无数据】——新ROM运行时收紧包可见性，DeviceOwner现强制重刷QUERY_ALL_PACKAGES/使用情况访问权限；扫描增加桌面API+使用记录双兜底通道；使用动态/巡航计时增加无障碍焦点窗第三数据源（使用情况权限被ROM禁用时不断档）；状态接口新增权限自诊断字段；②OTA更新完全静默化：只走设备所有者免确认安装通道，安装中/安装后均不弹任何界面和通知；③全部修复均为条件触发式兜底，正常机型行为零变化，Android7.0+通用"
+    "changelog": "v72：①修复部分新机型（荣耀平板BVL-AN16等MagicOS新版）【扫描APP列表为空】【APP使用动态无数据】——新ROM运行时收紧包可见性，DeviceOwner强制重刷权限；扫描增加桌面API+使用记录双兜底；使用动态/巡航增加无障碍焦点窗数据源（使用情况权限被ROM禁用时不断档）；②OTA完全静默：安装中/安装后均不弹任何界面和通知；③状态接口新增开发者模式/USB调试/无线调试真实系统状态回读，远程即可核验开关是否真生效；④全部修复均为条件触发式兜底，正常机型行为零变化，Android7.0+通用"
   }
 }
