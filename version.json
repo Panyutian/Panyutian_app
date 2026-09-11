@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 68,
+  "versionCode": 69,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 68,
+    "versionCode": 69,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v68：①正式更名为「雨田智能护眼管家」——家长端应用名改为护眼管家、启用眼睛Logo新图标、欢迎标语改为守护孩子健康从保护眼睛开始；②修复「禁止安装APP」与「游戏拦截」开关互相干扰的问题，两个功能现已彻底独立互不影响"
+    "changelog": "v69：①新增B站学习视频白名单——家长端可添加UP主UID/抓取当前视频UP主，孩子端打开B站秒弹选老师窗，只能看白名单UP主内容；②白名单卡片可折叠展开，保持主界面简洁；③抓取按钮改蓝色、UID输入字号调为13sp、标题改为「B站学习视频白名单」；④孩子端设备号前缀由honor_改为yiben_"
   },
   "child": {
-    "versionCode": 68,
+    "versionCode": 69,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "v68：①正式更名为「雨田智能护眼管家」，孩子端真界面标题同步更新，自保识别兼容新旧名称，对外伪装名不变；②修复「禁止安装APP」与「游戏拦截」开关互相干扰：禁装纯走系统级DeviceOwner限制（安装请求在系统层直接被拒），不再联动无障碍开关，无障碍只归游戏拦截控制，两个功能彻底互不干扰"
+    "changelog": "v69：①新增B站学习视频白名单落地守护——打开B站秒弹选老师窗，孩子只能进白名单UP主主页/视频；②修复横屏全屏播放误弹白名单窗（systemui瞬态识别）；③退出B站按钮三层退出（媒体暂停+DeviceOwner杀进程+回桌面），视频声音立即停止；④UP主页左上角返回键弹白名单而非直接退出；⑤桌面点B站图标秒弹（断安全导航会话，不再延迟1-5秒）；⑥设备号前缀由honor_改为yiben_"
   }
 }
