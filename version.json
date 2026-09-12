@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 81,
+  "versionCode": 82,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 81,
+    "versionCode": 82,
     "versionName": "3.0",
     "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v81：更新包改走国内CDN下载（jsDelivr多节点自动切换），修复GitHub代理失效导致“自动更新失败请手动更新”；含v80全部修复：解锁后离线、上线慢、切换孩子后名单/APP列表不刷新、使用动态改为近3天"
+    "changelog": "v82：家长端新增自动找孩子功能——连着服务器但看不到孩子时，自动在3个服务器间轮换搜寻，找到后记住该服务器；切换不同孩子也会自动找。含v80/v81全部修复"
   },
   "child": {
-    "versionCode": 81,
+    "versionCode": 82,
     "versionName": "3.0",
     "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
-    "changelog": "v81：更新包改走国内CDN下载（jsDelivr多节点自动切换），避免GitHub代理波动影响静默升级；含v80全部修复（亮屏/切网秒重连、记住可用服务器1秒上线、60秒内不漂移、使用动态窗口3天）。正常机型行为零变化，Android7.0+通用"
+    "changelog": "v82：配合家长端自动找孩子功能；更新包走国内CDN；含亮屏/切网秒重连、1秒上线、使用动态窗口3天等改进。正常机型行为零变化，Android7.0+通用"
   }
 }
