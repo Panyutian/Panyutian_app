@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 76,
+  "versionCode": 77,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 76,
+    "versionCode": 77,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v76：修复家长端v75在主服务器故障时一直显示MQTT连接中——切换备用服务器时旧连接未销毁导致切换无效，现已修复（孩子端v75不受影响无需重装）"
+    "changelog": "v77：①修复主服务器故障时一直显示MQTT连接中（v76内容）；②偶发“孩子手机超时未响应”加固：命令改为QoS1必达+7秒未响应自动重发+超时放宽到20秒，正常使用请选择“跨网络(MQTT)”模式"
   },
   "child": {
-    "versionCode": 76,
+    "versionCode": 77,
     "versionName": "3.0",
     "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "v75：修复免费公共MQTT服务器（broker.emqx.io）整体拒绝新连接导致设备升级后永久显示重连中/离线：①内置3组公共服务器（EMQX/mosquitto/HiveMQ），任一节点故障12秒内自动切换下一节点，运行中断线超40秒自动换服务器重建；②MQTT握手加12秒硬超时，杜绝TCP通但协议不响应时永久卡死；③连接失败指数退避轮换重试；④主服务器恢复后无需任何操作。其余v70-v74修复保持不变，正常机型行为零变化，Android7.0+通用"
+    "changelog": "v77：偶发“超时未响应”根治：①命令/结果/状态全部升级QoS1必达，配合持久会话，短暂断线期间消息由服务器暂存不丢；②孩子端缓存每条命令结果5分钟，家长端重发时不重复执行动作（锁屏/暂停不会触发两次）只补发上次结果；③v75多服务器故障转移保持不变。正常机型行为零变化，Android7.0+通用"
   }
 }
