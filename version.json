@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 80,
+  "versionCode": 81,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 80,
+    "versionCode": 81,
     "versionName": "3.0",
-    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-parent.apk",
-    "changelog": "v80：①修复解锁后孩子显示离线（家长端不再因网络小抖动在服务器间乱跳）；②打开APP上线恢复到1秒左右（记住可用服务器，不再白等故障主站）；③切换孩子设备号后立即清空并重新加载APP列表/B站名单/状态；④在线判定放宽，锁屏休眠中的短暂心跳延迟显示为黄色提示而非离线；⑤孩子APP使用动态记录窗口改为最近3天"
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-parent.apk",
+    "changelog": "v81：更新包改走国内CDN下载（jsDelivr多节点自动切换），修复GitHub代理失效导致“自动更新失败请手动更新”；含v80全部修复：解锁后离线、上线慢、切换孩子后名单/APP列表不刷新、使用动态改为近3天"
   },
   "child": {
-    "versionCode": 80,
+    "versionCode": 81,
     "versionName": "3.0",
-    "apkUrl": "https://github.com/Panyutian/Panyutian_app/releases/download/v3.0/HonorAppBlocker-child.apk",
-    "changelog": "v80：①亮屏/网络恢复瞬间立即唤醒MQTT重连（修复息屏被ROM冻结网络后家长端显示离线）；②自动重连退避从最长120秒收紧到10秒；③记住上次可用服务器，重启后1秒上线；④服务器判死切换从40秒放宽到60秒，避免国际链路抖动时与家长端错连不同节点；⑤APP使用动态保留窗口7天改为3天（旧的超出3天记录会自动清除）。正常机型行为零变化，Android7.0+通用"
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
+    "changelog": "v81：更新包改走国内CDN下载（jsDelivr多节点自动切换），避免GitHub代理波动影响静默升级；含v80全部修复（亮屏/切网秒重连、记住可用服务器1秒上线、60秒内不漂移、使用动态窗口3天）。正常机型行为零变化，Android7.0+通用"
   }
 }
