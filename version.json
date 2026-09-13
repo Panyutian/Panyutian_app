@@ -1,15 +1,15 @@
 ﻿{
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。v88 起 apkUrl 指向 GitHub raw 源：jsDelivr 边缘节点缓存回源延迟可达数十分钟，App 对 github.com 域名会自动展开 ghfast/gh-proxy 国内镜像下载，版本检查 7 线路仍包含 jsDelivr 三节点。",
-  "versionCode": 92,
+  "versionCode": 93,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 92,
+    "versionCode": 93,
     "versionName": "3.0",
     "apkUrl": "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
     "changelog": "v89：修复切换孩子设备/切换MQTT与WiFi通道后状态和B站名单不即时刷新（需冷启动才恢复）——与孩子心跳会合后自动补拉，切换后秒级刷新；MQTT心跳自动学习孩子最新局域网IP，路由器DHCP换IP后切WiFi不再误报离线"
   },
   "child": {
-    "versionCode": 92,
+    "versionCode": 93,
     "versionName": "3.0",
     "apkUrl": "http://192.168.0.104:8888/HonorAppBlocker-child.apk",
     "changelog": "v89：版本号同步，孩子端无功能变化，Android7.0+通用"
