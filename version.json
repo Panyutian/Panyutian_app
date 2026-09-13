@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。v88 起 apkUrl 指向 GitHub raw 源：jsDelivr 边缘节点缓存回源延迟可达数十分钟，App 对 github.com 域名会自动展开 ghfast/gh-proxy 国内镜像下载，版本检查 7 线路仍包含 jsDelivr 三节点。",
-  "versionCode": 99,
+  "versionCode": 100,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 99,
+    "versionCode": 100,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v99：修复删除WiFi条目后MQTT显示已连接但功能全失效（设备号被误清空导致未订阅/命令发空）；WiFi栏不再显示设备号、增删WiFi条目绝不影响MQTT绑定，设备号丢失会自动恢复；孩子端修复静默升级后家长设置的允许安装APP被强制改回禁止，以后升级/重启都延续您的设置"
+    "changelog": "v100：版本号同步（本版改动在孩子端，家长端无功能变化，含v99全部修复：MQTT设备号防清空自愈、WiFi栏不显示设备号）；v99修复删除WiFi条目后MQTT显示已连接但功能全失效"
   },
   "child": {
-    "versionCode": 99,
+    "versionCode": 100,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
-    "changelog": "v99：修复静默升级后家长设置的允许安装APP被强制改回禁止——以后升级自动恢复您设置的开关状态，不再被冲掉；v93修复安卓14+（含安卓16）进程被杀后无法自恢复——三重保活9-15分钟内自动回来；MQTT半开连接5秒超时自动重连；Android7.0+通用"
+    "changelog": "v100：根治MQTT罕见单向卡死——心跳正常但家长命令收不到（公共broker/NAT会话假活），现在每30分钟自动重建会话，最长30分钟自愈、不换服务器不断线感；含v99：升级后保持家长设置的允许/禁止安装APP；v93安卓14+三重保活；Android7.0+通用"
   }
 }
