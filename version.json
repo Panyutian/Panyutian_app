@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。",
-  "versionCode": 83,
+  "versionCode": 84,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 83,
+    "versionCode": 84,
     "versionName": "3.0",
     "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v83：连接提速——打开APP/切换孩子时同时探测3个服务器并主动催孩子回心跳，1秒左右自动锁定孩子所在服务器；启动自动订阅从3秒提前到1.2秒"
+    "changelog": "v84：孩子端新增完全静默自动更新（开机/上线自动检查，发现新版自己安装，无需家长手动推送）；家长端连接提速稳定性增强"
   },
   "child": {
-    "versionCode": 83,
+    "versionCode": 84,
     "versionName": "3.0",
     "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
-    "changelog": "v83：配合家长端极速连接（响应家长主动探测）；行为无变化，Android7.0+通用"
+    "changelog": "v84：新增完全静默自动更新——开机/上线90秒后自动检查，之后每4小时检查一次，发现新版自动下载静默安装（零弹窗零通知）；只在WiFi下自动下载，移动网络不耗流量；防护策略安装后照常自动恢复。行为无其他变化，Android7.0+通用"
   }
 }
