@@ -11,7 +11,7 @@
   "child": {
     "versionCode": 91,
     "versionName": "3.0",
-    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
+    "apkUrl": "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
     "changelog": "v89：版本号同步，孩子端无功能变化，Android7.0+通用"
   }
 }
