@@ -5,13 +5,13 @@
   "parent": {
     "versionCode": 93,
     "versionName": "3.0",
-    "apkUrl": "https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-parent.apk",
     "changelog": "v89：修复切换孩子设备/切换MQTT与WiFi通道后状态和B站名单不即时刷新（需冷启动才恢复）——与孩子心跳会合后自动补拉，切换后秒级刷新；MQTT心跳自动学习孩子最新局域网IP，路由器DHCP换IP后切WiFi不再误报离线"
   },
   "child": {
     "versionCode": 93,
     "versionName": "3.0",
-    "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
     "changelog": "v89：版本号同步，孩子端无功能变化，Android7.0+通用"
   }
 }
