@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。v88 起 apkUrl 指向 GitHub raw 源：jsDelivr 边缘节点缓存回源延迟可达数十分钟，App 对 github.com 域名会自动展开 ghfast/gh-proxy 国内镜像下载，版本检查 7 线路仍包含 jsDelivr 三节点。",
-  "versionCode": 96,
+  "versionCode": 97,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 96,
+    "versionCode": 97,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v96：修复已保存设备区「WiFi条目删不掉、加不了」——删除时同步清理心跳学习的IP映射；WiFi模式显示设备号输入、手动添加的WiFi条目可见；孩子外出时WiFi条目自动标注「移动网络不可直连」（外出请用MQTT条目）；v95修复CDN缓存旧包导致更新后版本不变"
+    "changelog": "v97：已保存设备区回归独立管理——WiFi条目只显示IP不显示设备号、MQTT/WiFi完全分开；删除=真删（心跳不再自动重建条目）；手动添加只需IP+密码（设备号选填，填了则IP变化自动更新条目）；孩子外出时条目标注「移动网络不可直连」"
   },
   "child": {
-    "versionCode": 96,
+    "versionCode": 97,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
-    "changelog": "v96：版本号同步（本版改动在家长端，孩子端无功能变化）；v95修复CDN缓存旧APK导致更新后版本不变；v93修复安卓14+（含安卓16）进程被杀后无法自恢复——三重保活9-15分钟内自动回来；MQTT半开连接5秒超时自动重连；Android7.0+通用"
+    "changelog": "v97：版本号同步（本版改动在家长端，孩子端无功能变化）；v95修复CDN缓存旧APK导致更新后版本不变；v93修复安卓14+（含安卓16）进程被杀后无法自恢复——三重保活9-15分钟内自动回来；MQTT半开连接5秒超时自动重连；Android7.0+通用"
   }
 }
