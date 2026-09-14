@@ -5,13 +5,13 @@
   "parent": {
     "versionCode": 103,
     "versionName": "3.0",
-    "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v103：修复家长端收到旧心跳后误判'已连接'导致功能全失效（AN20假连接）；修复切换孩子后电量/状态串扰（AN16显示AN20电量）——丢弃非当前孩子的status/result消息"
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-parent.apk",
+    "changelog": "v103：修复家长端收到旧心跳后误判已连接导致功能全失效（AN20假连接）；修复切换孩子后电量状态串扰（AN16显示AN20电量）"
   },
   "child": {
     "versionCode": 102,
     "versionName": "3.0",
-    "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
+    "apkUrl": "https://cdn.jsdelivr.net/gh/Panyutian/Panyutian_app@main/apks/HonorAppBlocker-child.apk",
     "changelog": "v102：修复会话刷新导致每30分钟漂移broker的bug"
   }
 }
