@@ -1,17 +1,17 @@
 {
   "_notes": "versionCode/versionName 两端共用、始终同步：根级与 parent/child 节点内各写一份（内容一致），根级给新版 App 读，节点内保留是为了兼容旧版 App（旧版只从节点里读，缺字段会解析失败）。versionName 只写基础版本号，编译时 Gradle 自动拼接成 3.0-版本码+构建日期时间。apkUrl 用【固定文件名】，每次发版只替换 Release 里同名文件内容，链接永不变，避免 CDN 缓存旧链接导致下载 404。是否更新只看 versionCode。v88 起 apkUrl 指向 GitHub raw 源：jsDelivr 边缘节点缓存回源延迟可达数十分钟，App 对 github.com 域名会自动展开 ghfast/gh-proxy 国内镜像下载，版本检查 7 线路仍包含 jsDelivr 三节点。",
-  "versionCode": 100,
+  "versionCode": 101,
   "versionName": "3.0",
   "parent": {
-    "versionCode": 100,
+    "versionCode": 101,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-parent.apk",
-    "changelog": "v100：版本号同步（本版改动在孩子端，家长端无功能变化，含v99全部修复：MQTT设备号防清空自愈、WiFi栏不显示设备号）；v99修复删除WiFi条目后MQTT显示已连接但功能全失效"
+    "changelog": "v101：版本号同步（本版改动在孩子端，家长端无功能变化）；v100修复MQTT罕见单向卡死"
   },
   "child": {
-    "versionCode": 100,
+    "versionCode": 101,
     "versionName": "3.0",
     "apkUrl": "https://gh-proxy.com/https://raw.githubusercontent.com/Panyutian/Panyutian_app/main/apks/HonorAppBlocker-child.apk",
-    "changelog": "v100：根治MQTT罕见单向卡死——心跳正常但家长命令收不到（公共broker/NAT会话假活），现在每30分钟自动重建会话，最长30分钟自愈、不换服务器不断线感；含v99：升级后保持家长设置的允许/禁止安装APP；v93安卓14+三重保活；Android7.0+通用"
+    "changelog": "v101：修复v100会话刷新导致每30分钟漂移到下一个broker、家长端显示离线的bug——会话刷新时留在同broker重建，只有真正故障才切换节点；含v100 MQTT单向卡死自愈、v99设置保留"
   }
 }
